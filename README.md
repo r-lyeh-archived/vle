@@ -1,23 +1,23 @@
 # vle
 
 - VLE is a simple variable-length encoder/decoder (C99)(C++03)
-- VLE is magnitude friendly. No matter what number you encode. It just works.
-- VLE is streamable. Format is 7-bit packing, MSB terminator.
+- VLE is compact. No matter what type you encode, VLE encodes magnitudes with low overhead.
 - VLE is designed for 1/2/3..62/63/64/\*... bits signed/unsigned integers (\*: easily extendable).
+- VLE is streamable. Format is 7-bit packing, MSB terminator.
 - VLE is embeddable. Header-only. Both C/C++ APIs provided.
 - VLE is BOOST licensed.
 
 ## Features
-- Encodes/decodes any magnitude number with small overhead: 8,9,10,11...20..24..40..48..56..63,64 bits.
-- Type does not matter. Magnitude of encoded number determinates size of stream.
-  - Ie, big numbers that contain small values are serialized to smallest fit:
+- Encodes/decodes any magnitude integer with low overhead: 8,9,10,11...20..24..40..48..56..63,64 bits.
+- Type does not matter. Magnitude of encoded integer determinates size of stream.
+  - Ie, big integers that contain small values are serialized to smallest fit:
   - byte(0), short(0), int(0), int64(0) all of them require 1-byte.
   - byte(127), short(127), int(127), int64(127) all of them require 1-byte.
   - byte(255), short(255), int(255), int64(255) all of them require 2-bytes.
   - short(16384), int(16384), int64(16384) all of them require 3-bytes.
   - and so on... (see range tables below).
-- Rule is, the smaller the magnitude number you encode, the smaller the stream you decode. 
-  - Negative numbers are rearranged to meet this criteria (see appendix).
+- Rule is, the smaller the magnitude integer you encode, the smaller the stream you decode. 
+  - Negative integers are rearranged to meet this criteria (see appendix).
 - VLE applies to serialization, network, binary headers, packets, etc...
 
 ## API, C++
@@ -36,7 +36,7 @@ ns vleu {
 - Basic API. Allows streaming and fine control.
 - Encoders do not append null character at end of string.
 - Decoders do not need null character at end of string.
-- All functions return number of streamed bytes.
+- All functions return integer of streamed bytes.
 ```c
  VLE_API uint64_t vle_encode_u(  uint8_t *buffer, uint64_t value );
  VLE_API uint64_t vle_encode_i(  uint8_t *buffer,  int64_t value );
