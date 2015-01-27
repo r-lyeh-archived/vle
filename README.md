@@ -11,6 +11,9 @@
 - Say you want to serialize an `uint64_t buf[3];`. Instead of flushing a 24-bytes stream, you use VLE.
 - VLE serializes 64-bit numbers from 1 byte (best-case) to 10 bytes (worst-case). So this buffer could get encoded from 3 bytes (best-case, savings of 19-bytes) to 30 bytes (worst-case, overhead of 6-bytes).
 
+## Theory
+Data is processed into/from a variable length encoding value, where bytes are just 7-bit shifted and added from/into a big accumulator until MSB is found. Additionally, signed integers are pre-encoded to a more efficent bitwise encoding.
+
 ## Features
 - Encodes/decodes any magnitude integer with low overhead: 8,9,10,11...20..24..40..48..56..63,64 bits.
 - Type does not matter. Magnitude of encoded integer determinates size of stream.
