@@ -20,7 +20,8 @@
  * Basic API. Allows streaming and fine control.
  * Encoders do not append null character at end of string.
  * Decoders do not need null character at end of string.
- * All functions return number of streamed bytes.
+ * All functions assume buffers are preallocated to worst-case scenarios.
+ * All functions return integer of streamed bytes. 
  *
  * - VLE_API uint64_t vle_encode_u(  uint8_t *buffer, uint64_t value );
  * - VLE_API uint64_t vle_encode_i(  uint8_t *buffer,  int64_t value );
@@ -83,9 +84,8 @@ VLE_API uint64_t vle_decode_i( int64_t *value, const uint8_t *buffer ) {
 namespace vlei {
     static inline
     std::string encode( int64_t value ) {
-        unsigned char buf[VLE_MAX_REQ_BYTES + 1];
-        buf[ vle_encode_i( &buf[0], value ) ] = (unsigned char)'\0';
-        return (const char *)&buf[0];
+        unsigned char buf[ VLE_MAX_REQ_BYTES ];
+        return std::string( (const char *)buf, vle_encode_i( &buf[0], value ) );
     }
 
     static inline
@@ -99,9 +99,8 @@ namespace vlei {
 namespace vleu {
     static inline
     std::string encode( uint64_t value ) {
-        unsigned char buf[VLE_MAX_REQ_BYTES + 1];
-        buf[ vle_encode_u( &buf[0], value ) ] = (unsigned char)'\0';
-        return (const char *)&buf[0];
+        unsigned char buf[ VLE_MAX_REQ_BYTES ];
+        return std::string( (const char *)buf, vle_encode_u( &buf[0], value ) );
     }
 
     static inline

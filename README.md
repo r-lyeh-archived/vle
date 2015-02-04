@@ -1,54 +1,61 @@
 # vle
 
 - VLE is a simple variable-length encoder/decoder (C99)(C++03)
-- VLE is compact. No matter what type you encode, VLE encodes magnitudes with low overhead.
-- VLE is designed for 1/2/3..62/63/64/\*... bits signed/unsigned integers (\*: easily extendable).
-- VLE is streamable. Format is 7-bit packing, MSB terminator.
-- VLE is embeddable. Header-only. Both C/C++ APIs provided.
+- VLE is simple. Format is 7-bit packing, MSB stream terminator.
+- VLE is streamable. Designed to encode and decode integers with low overhead.
+- VLE is embeddable. Header-only. No external deps. C and C++ APIs provided.
+- VLE is extendable. Signed/unsigned integers of any size (8/16/32/64/...) are supported.
 - VLE is BOOST licensed.
 
-## TL;DR
-- Say you want to serialize an `uint64_t buf[3];`. Instead of flushing a 24-bytes stream, you use VLE.
-- VLE serializes 64-bit numbers from 1 byte (best-case) to 10 bytes (worst-case). So this buffer could get encoded from 3 bytes (best-case, savings of 19-bytes) to 30 bytes (worst-case, overhead of 6-bytes).
-
-## Theory
-Data is processed into/from a variable length encoding value, where bytes are just 7-bit shifted and added from/into a big accumulator until MSB is found. Additionally, signed integers are pre-encoded to a more efficent bitwise encoding.
+## Quick tutorial
+- You want to serialize an `struct { uint16_t len; uint64_t buffer[6]; }` to disk, network, etc...
+- You could just flush a 50-bytes stream, or you could flush a VLE stream instead.
+- For any 8-bit sequence, the VLE stream will range from `len` up to `2*len` bytes.
+- For any 16-bit sequence, the VLE stream will range from `len` up to `3*len` bytes.
+- For any 32-bit sequence, the VLE stream will range from `len` up to `5*len` bytes.
+- For any 64-bit sequence, the VLE stream will range from `len` up to `10*len` bytes.
+- This VLE stream will range from `7-bytes` (best-case, 43-bytes saved) up to `63-bytes` (worst-case, 13-bytes overhead).
 
 ## Features
-- Encodes/decodes any magnitude integer with low overhead: 8,9,10,11...20..24..40..48..56..63,64 bits.
-- Type does not matter. Magnitude of encoded integer determinates size of stream.
-  - Ie, big integers that contain small values are serialized to smallest fit:
-  - byte(0), short(0), int(0), int64(0) all of them require 1-byte.
-  - byte(127), short(127), int(127), int64(127) all of them require 1-byte.
-  - byte(255), short(255), int(255), int64(255) all of them require 2-bytes.
-  - short(16384), int(16384), int64(16384) all of them require 3-bytes.
-  - and so on... (see range tables below).
-- Rule is, the smaller the magnitude integer you encode, the smaller the stream you decode. 
-  - Negative integers are rearranged to meet this criteria (see appendix).
-- VLE applies to serialization, network, binary headers, packets, etc...
+- Magnitude of value determinates size of encoded stream. Magnitude of type does not matter.
+  - All `byte(0), short(0), int(0), int64(0)...` serialize to a `1-byte` stream.
+  - All `byte(127), short(127), int(127), int64(127)...` serialize to a `1-byte` stream.
+  - All `byte(128), short(128), int(128), int64(128)...` serialize to a `2-bytes` stream.
+  - All `byte(255), short(255), int(255), int64(255)...` serialize to a `2-bytes` stream.
+  - All `short(16383), int(16383), int64(16383)...` serialize to a `2-bytes` stream.
+  - All `short(16384), int(16384), int64(16384)...` serialize to a `3-bytes` stream.
+  - And so on... (see range tables below).
+- Rule: The closer to zero integer you encode, the smaller the stream you decode. 
+  - Note: Negative integers are rearranged to meet this criteria (see appendix).
 
-## API, C++
-```c++
-ns vlei {
-  string   encode( int64_t );
-  int64_t  decode( string );
-}
-ns vleu {
-  string   encode( uint64_t );
-  uint64_t decode( string );   
-}
-```
+## VLE stream format
+- All non-significative (zero) bits on the left are discarded.
+- Bytes are repacked into 7-bit components and glued together until a LSB/MSB bit is found.
+- Additionally, signed integers are pre-encoded and post-decoded to a more efficient signed number representation.
 
 ## API, C
 - Basic API. Allows streaming and fine control.
 - Encoders do not append null character at end of string.
 - Decoders do not need null character at end of string.
-- All functions return integer of streamed bytes.
+- All functions assume buffers are preallocated to worst-case scenarios.
+- All functions return integer of streamed bytes. 
 ```c
  VLE_API uint64_t vle_encode_u(  uint8_t *buffer, uint64_t value );
  VLE_API uint64_t vle_encode_i(  uint8_t *buffer,  int64_t value );
  VLE_API uint64_t vle_decode_u( uint64_t *value, const uint8_t *buffer );
  VLE_API uint64_t vle_decode_i(  int64_t *value, const uint8_t *buffer );
+```
+
+## API, C++
+```c++
+vlei:: {
+  string   encode( int64_t );
+  int64_t  decode( string );
+}
+vleu:: {
+  string   encode( uint64_t );
+  uint64_t decode( string );   
+}
 ```
 
 ## VLE unsigned, 64-bit ranges
@@ -92,7 +99,7 @@ ns vleu {
 - [collage](https://github.com/r-lyeh/collage), a diff/patch library.
 - [bundle](https://github.com/r-lyeh/bundle), a de/compression library.
 
-## appendix, some more sign theory
+## appendix: sign theory and conversion functions
 
 | ## | Signed-Magnitude | Complement-2  | VLEi (*)  |
 |:--:|:----------------:|:-------------:|:-----:|
