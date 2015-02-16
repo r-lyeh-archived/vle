@@ -10,13 +10,13 @@
 ## Quick tutorial
 - You want to serialize an `struct { uint16_t len; uint64_t buffer[6]; }` to disk, network, etc...
 - You could just flush a 50-bytes stream, or you could flush a VLE stream instead.
+- This VLE stream will range from `7-bytes` (best-case, 43-bytes saved) up to `63-bytes` (worst-case, 13-bytes overhead).
+
+## Features
 - For any 8-bit sequence, the VLE stream will range from `len` up to `2*len` bytes.
 - For any 16-bit sequence, the VLE stream will range from `len` up to `3*len` bytes.
 - For any 32-bit sequence, the VLE stream will range from `len` up to `5*len` bytes.
 - For any 64-bit sequence, the VLE stream will range from `len` up to `10*len` bytes.
-- This VLE stream will range from `7-bytes` (best-case, 43-bytes saved) up to `63-bytes` (worst-case, 13-bytes overhead).
-
-## Features
 - Magnitude of value determinates size of encoded stream. Magnitude of type does not matter.
   - All `byte(0), short(0), int(0), int64(0)...` serialize to a `1-byte` stream.
   - All `byte(127), short(127), int(127), int64(127)...` serialize to a `1-byte` stream.
