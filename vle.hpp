@@ -35,9 +35,13 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-#define VLE_API extern "C" static inline
-#else
-#define VLE_API            static inline
+#include <string>
+#define VLE_API     static inline
+extern "C" {
+#endif
+
+#ifndef VLE_API
+#define VLE_API     static 
 #endif
 
 enum { VLE_MIN_REQ_BYTES = 1, VLE_MAX_REQ_BYTES = 10 };
@@ -79,7 +83,7 @@ VLE_API uint64_t vle_decode_i( int64_t *value, const uint8_t *buffer ) {
 }
 
 #ifdef __cplusplus
-#include <string>
+}
 
 namespace vlei {
     static inline

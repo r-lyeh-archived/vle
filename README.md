@@ -1,4 +1,5 @@
-# vle
+vle <a href="https://travis-ci.org/r-lyeh/vle"><img src="https://api.travis-ci.org/r-lyeh/vle.svg?branch=master" align="right" /></a>
+===
 
 - VLE is a simple variable-length encoder/decoder (C99)(C++03)
 - VLE is simple. Format is 7-bit packing, MSB stream terminator.
@@ -25,7 +26,7 @@
   - All `short(16383), int(16383), int64(16383)...` serialize to a `2-bytes` stream.
   - All `short(16384), int(16384), int64(16384)...` serialize to a `3-bytes` stream.
   - And so on... (see range tables below).
-- Rule: The closer to zero integer you encode, the smaller the stream you decode. 
+- Rule: The closer to zero integer you encode, the smaller the stream you decode.
   - Note: Negative integers are rearranged to meet this criteria (see appendix).
 
 ## VLE stream format
@@ -38,7 +39,7 @@
 - Encoders do not append null character at end of string.
 - Decoders do not need null character at end of string.
 - All functions assume buffers are preallocated to worst-case scenarios.
-- All functions return integer of streamed bytes. 
+- All functions return integer of streamed bytes.
 ```c
  VLE_API uint64_t vle_encode_u(  uint8_t *buffer, uint64_t value );
  VLE_API uint64_t vle_encode_i(  uint8_t *buffer,  int64_t value );
@@ -54,7 +55,7 @@ vlei:: {
 }
 vleu:: {
   string   encode( uint64_t );
-  uint64_t decode( string );   
+  uint64_t decode( string );
 }
 ```
 

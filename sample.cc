@@ -8,8 +8,8 @@ std::string report;
 uint64_t errors = 0;
 
 void quick_tests() {
-     int64_t is[] = { 1ull << 63, +(1ll << 63), -(1ull << 63), INT64_MIN, INT64_MIN + 1, INT64_MIN / 2, INT64_MIN / 4, -0, 0,  INT64_MAX / 4,  INT64_MAX / 2,  INT64_MAX - 1,  INT64_MAX };
-    uint64_t us[] = { 1ull << 63, +(1ll << 63), -(1ull << 63),                                                         -0, 0, UINT64_MAX / 4, UINT64_MAX / 2, UINT64_MAX - 1, UINT64_MAX };
+     int64_t is[] = { (int64_t)1ull << 63,           +(1ll << 63), (int64_t)-(1ull << 63), INT64_MIN, INT64_MIN + 1, INT64_MIN / 2, INT64_MIN / 4, -0, 0,  INT64_MAX / 4,  INT64_MAX / 2,  INT64_MAX - 1,  INT64_MAX };
+    uint64_t us[] = {          1ull << 63, (uint64_t)+(1ll << 63),          -(1ull << 63),                                                         -0, 0, UINT64_MAX / 4, UINT64_MAX / 2, UINT64_MAX - 1, UINT64_MAX };
 
     for( auto i : is ) {
         if( i != vlei::decode(vlei::encode(i)) ) {
@@ -42,7 +42,7 @@ int main( int argc, const char **argv )
             assert( i == vlei::decode( vlei::encode( i ) ) );
             if( len < capacity && j < 63 ) {
                 capacity = len;
-                printf("%2llu bytes [%lld..%lld]\n", capacity + 1, i0, j < 0 ? 0 : i - 1 ); 
+                printf("%2lld bytes [%lld..%lld]\n", capacity + 1, i0, j < 0 ? 0 : i - 1 ); 
                 i0 = i;
             }
         }
@@ -53,7 +53,7 @@ int main( int argc, const char **argv )
             auto len = vlei::encode( i ).size();
             assert( i == vlei::decode( vlei::encode( i ) ) );
             if( len > capacity || j == 63 ) {
-                printf("%2llu bytes [%llu..%llu]\n", capacity, i0, (i-1) ); 
+                printf("%2lld bytes [%llu..%llu]\n", capacity, i0, (i-1) ); 
                 capacity = len;
                 i0 = i;
             }
@@ -68,7 +68,7 @@ int main( int argc, const char **argv )
             auto len = vleu::encode( i ).size();
             assert( i == vleu::decode( vleu::encode( i ) ) );
             if( len > capacity || j == 64 ) {
-                printf("%2llu bytes [%llu..%llu]\n", capacity, i0, (i-1) ); 
+                printf("%2lld bytes [%llu..%llu]\n", capacity, i0, (i-1) ); 
                 capacity = len;
                 i0 = i;
             }
