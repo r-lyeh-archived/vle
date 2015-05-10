@@ -6,7 +6,7 @@ vle <a href="https://travis-ci.org/r-lyeh/vle"><img src="https://api.travis-ci.o
 - VLE is streamable. Designed to encode and decode integers with low overhead.
 - VLE is embeddable. Header-only. No external deps. C and C++ APIs provided.
 - VLE is extendable. Signed/unsigned integers of any size (8/16/32/64/...) are supported.
-- VLE is BOOST licensed.
+- VLE is zlib/libpng licensed.
 
 ## Quick tutorial
 - You want to serialize an `struct { uint16_t len; uint64_t buffer[6]; }` to disk, network, etc...
